@@ -19,6 +19,13 @@ export default function Home() {
     onlyOpen: false
   });
 
+  // Filtreler değiştiğinde otomatik arama yap
+  useEffect(() => {
+    if (filters.district !== 'all' || filters.category !== 'all' || filters.query) {
+      handleSearch();
+    }
+  }, [filters.district, filters.category, filters.query]);
+
   const [searchParams, setSearchParams] = useState<BusinessSearchParams | null>(null);
   const [shouldSearch, setShouldSearch] = useState(false);
   const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(null);
@@ -49,21 +56,17 @@ export default function Home() {
 
   // Arama fonksiyonu
   const handleSearch = () => {
-    if (!userLocation) {
-      console.error('Konum bilgisi henüz alınmadı');
-      return;
-    }
-
-    // Arama parametrelerini hazırla
-    let searchLocation = userLocation;
-    let searchRadius = filters.maxDistance * 1000; // km to meters
-
-    // İlçe seçilmişse o ilçenin merkezini kullan
+    // İlçe seçilmişse o ilçenin merkezini kullan, yoksa İstanbul merkezi
+    let searchLocation;
     if (filters.district && filters.district !== 'all') {
       const district = getDistrictByName(filters.district);
       if (district) {
         searchLocation = district.center;
+      } else {
+        searchLocation = { lat: 41.0082, lng: 28.9784 }; // İstanbul merkezi
       }
+    } else {
+      searchLocation = { lat: 41.0082, lng: 28.9784 }; // İstanbul merkezi
     }
 
     // Kategori seçilmişse type'ları al
@@ -71,23 +74,18 @@ export default function Home() {
     if (filters.category && filters.category !== 'all') {
       const types = getCategoryTypes(filters.category);
       if (types.length > 0) {
-        searchType = types[0]; // İlk type'ı kullan
+        searchType = types[0];
       }
     }
 
     const params: BusinessSearchParams = {
       location: searchLocation,
-      radius: Math.min(searchRadius, 50000), // Maksimum 50km
-      keyword: filters.query || undefined,
-      type: searchType || undefined,
-      opennow: filters.onlyOpen || undefined
+      radius: 5000, // 5km sabit mesafe
+      keyword: filters.query || (searchType ? '' : 'restaurant'),
+      type: searchType || 'restaurant'
     };
 
-    // Rating filtresi için price level kullan (yaklaşık)
-    if (filters.minRating >= 4) {
-      params.minprice = 2;
-    }
-
+    console.log('Arama parametreleri:', params);
     setSearchParams(params);
     setShouldSearch(true);
     
@@ -176,20 +174,14 @@ export default function Home() {
 
         {/* Harita ve Sonuçlar Alanı */}
         <div className="flex-1 flex flex-col">
-          {/* Harita Alanı - Daha küçük */}
+          {/* Harita Alanı - Gerçek Google Maps */}
           <div className="h-64 bg-gray-100 relative">
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="text-center p-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-2">
-                  <MapPin className="text-white text-lg" />
-                </div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-1">İstanbul Haritası</h4>
-                <p className="text-sm text-gray-600">
-                  {filters.district !== 'all' ? `${filters.district} İlçesi` : 'Tüm İlçeler'} - 
-                  {filters.category !== 'all' ? ` ${filters.category}` : ' Tüm Kategoriler'}
-                </p>
-              </div>
-            </div>
+            <MapContainer
+              onBusinessSelect={handleBusinessSelect}
+              searchParams={searchParams}
+              shouldSearch={shouldSearch}
+              onSearchComplete={handleSearchComplete}
+            />
           </div>
           
           {/* Sonuçlar Alanı - Genişletildi */}
