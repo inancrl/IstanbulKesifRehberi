@@ -32,6 +32,7 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [userLocation, setUserLocation] = useState<{lat: number; lng: number} | null>(null);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
 
   // Kullanıcı konumunu al
   useEffect(() => {
@@ -94,8 +95,11 @@ export default function Home() {
   };
 
   // Arama tamamlandığında
-  const handleSearchComplete = () => {
+  const handleSearchComplete = (results?: any[]) => {
     setShouldSearch(false);
+    if (results) {
+      setSearchResults(results);
+    }
   };
 
   // İşletme seçildiğinde
@@ -191,80 +195,54 @@ export default function Home() {
                 {filters.district !== 'all' ? `${filters.district} İlçesi` : 'İstanbul'} İşletmeleri
               </h3>
               
-              {/* İşletme listesi - filtreler uygulandığında güncellenir */}
+              {/* Gerçek işletme listesi - Google Places verilerinden */}
               <div className="space-y-3">
-                {filters.district !== 'all' || filters.category !== 'all' || filters.query ? (
-                  // Filtrelenmiş sonuçlar
-                  [
-                    {
-                      name: `${filters.query || 'Lezzet'} Restoran`,
-                      district: filters.district !== 'all' ? filters.district : 'Kadıköy',
-                      category: filters.category !== 'all' ? filters.category : 'Restoran',
-                      rating: 4.5,
-                      reviews: 124,
-                      isOpen: true
-                    },
-                    {
-                      name: `${filters.query || 'Gurme'} Cafe`,
-                      district: filters.district !== 'all' ? filters.district : 'Beşiktaş',
-                      category: filters.category !== 'all' ? filters.category : 'Kafe',
-                      rating: 4.2,
-                      reviews: 89,
-                      isOpen: true
-                    },
-                    {
-                      name: `${filters.query || 'Modern'} Market`,
-                      district: filters.district !== 'all' ? filters.district : 'Şişli',
-                      category: filters.category !== 'all' ? filters.category : 'Market',
-                      rating: 4.0,
-                      reviews: 56,
-                      isOpen: false
-                    }
-                  ].filter(business => {
-                    // Rating filtresi
-                    if (filters.minRating > 0 && business.rating < filters.minRating) {
-                      return false;
-                    }
-                    // Açık/kapalı filtresi
-                    if (filters.onlyOpen && !business.isOpen) {
-                      return false;
-                    }
-                    return true;
-                  }).map((business, index) => (
-                    <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow cursor-pointer">
+                {searchResults.length > 0 ? (
+                  searchResults.slice(0, 20).map((place, index) => (
+                    <div key={place.place_id || index} className="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow cursor-pointer">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <h4 className="font-medium text-gray-900 mb-1">
-                            {business.name}
+                            {place.name || 'İsimsiz İşletme'}
                           </h4>
                           <p className="text-sm text-gray-600 mb-2">
-                            {business.district}, İstanbul
+                            {place.vicinity || place.formatted_address || 'Adres bilgisi yok'}
                           </p>
                           <div className="flex items-center space-x-2 mb-2">
                             <div className="flex">
                               {Array.from({ length: 5 }).map((_, i) => (
                                 <Star
                                   key={i}
-                                  className={`w-3 h-3 ${i < Math.floor(business.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                                  className={`w-3 h-3 ${i < Math.floor(place.rating || 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
                                 />
                               ))}
                             </div>
-                            <span className="text-sm text-gray-600">{business.rating} ({business.reviews} değerlendirme)</span>
+                            <span className="text-sm text-gray-600">
+                              {place.rating ? `${place.rating.toFixed(1)}` : 'Değerlendirme yok'} 
+                              {place.user_ratings_total ? ` (${place.user_ratings_total} değerlendirme)` : ''}
+                            </span>
                           </div>
                           <div className="flex flex-wrap gap-2">
                             <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
-                              {business.category}
+                              {place.types && place.types[0] ? place.types[0].replace(/_/g, ' ') : 'İşletme'}
                             </span>
-                            <span className={`px-2 py-1 text-xs rounded ${business.isOpen ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                              {business.isOpen ? 'Açık' : 'Kapalı'}
-                            </span>
+                            {place.opening_hours && (
+                              <span className={`px-2 py-1 text-xs rounded ${place.opening_hours.open_now ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                {place.opening_hours.open_now ? 'Açık' : 'Kapalı'}
+                              </span>
+                            )}
+                            {place.price_level && (
+                              <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded">
+                                {'₺'.repeat(place.price_level)}
+                              </span>
+                            )}
                           </div>
                         </div>
                         <Button 
                           size="sm" 
                           variant="outline" 
                           className="ml-4"
-                          onClick={() => handleBusinessSelect(`place_${index}`)}
+                          onClick={() => handleBusinessSelect(place.place_id)}
                         >
                           Detaylar
                         </Button>
@@ -272,11 +250,11 @@ export default function Home() {
                     </div>
                   ))
                 ) : (
-                  // Varsayılan durum - filtre seçilmemiş
+                  // Varsayılan durum - arama yapılmamış
                   <div className="text-center py-8 text-gray-500">
                     <MapPin className="w-12 h-12 mx-auto mb-4 text-gray-400" />
                     <p className="text-lg mb-2">İşletme aramaya başlayın</p>
-                    <p className="text-sm">Sol taraftaki filtreleri kullanarak arama yapabilirsiniz</p>
+                    <p className="text-sm">Bir ilçe ve kategori seçerek arama yapabilirsiniz</p>
                   </div>
                 )}
               </div>

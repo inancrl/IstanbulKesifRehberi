@@ -117,7 +117,7 @@ export function MapContainer({
             map.setZoom(13);
           }
         }
-        onSearchComplete();
+        onSearchComplete(results);
       });
     };
 
