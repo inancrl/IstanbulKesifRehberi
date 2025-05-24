@@ -220,8 +220,7 @@ export const BUSINESS_CATEGORIES = [
   { id: "service", name: "Hizmetler", types: ["bank", "atm", "car_repair", "gas_station", "laundry"] },
   { id: "entertainment", name: "Eğlence & Kültür", types: ["movie_theater", "museum", "park", "tourist_attraction", "night_club"] },
   { id: "education", name: "Eğitim", types: ["school", "university", "library"] },
-  { id: "accommodation", name: "Konaklama", types: ["lodging", "hotel"] },
-  { id: "transport", name: "Ulaşım", types: ["bus_station", "subway_station", "taxi_stand", "airport"] }
+  { id: "accommodation", name: "Konaklama", types: ["lodging", "hotel"] }
 ];
 
 export function getDistrictByName(name: string): District | undefined {

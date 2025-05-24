@@ -4,7 +4,7 @@ interface MapContainerProps {
   onBusinessSelect: (placeId: string) => void;
   searchParams: any;
   shouldSearch: boolean;
-  onSearchComplete: () => void;
+  onSearchComplete: (results?: any[]) => void;
 }
 
 declare global {
@@ -22,6 +22,7 @@ export function MapContainer({
   const mapRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [map, setMap] = useState<any>(null);
+  const [markers, setMarkers] = useState<any[]>([]);
 
   useEffect(() => {
     const loadGoogleMaps = () => {
@@ -68,6 +69,10 @@ export function MapContainer({
     if (!map || !shouldSearch || !searchParams) return;
 
     const performSearch = () => {
+      // Eski markerları temizle
+      markers.forEach(marker => marker.setMap(null));
+      setMarkers([]);
+
       const service = new window.google.maps.places.PlacesService(map);
       
       const request = {
@@ -79,7 +84,9 @@ export function MapContainer({
 
       service.nearbySearch(request, (results: any[], status: any) => {
         if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
-          // Markerları ekle
+          const newMarkers: any[] = [];
+          
+          // Yeni markerları ekle
           results.slice(0, 20).forEach((place) => {
             if (place.geometry?.location) {
               const marker = new window.google.maps.Marker({
@@ -97,8 +104,12 @@ export function MapContainer({
                   onBusinessSelect(place.place_id);
                 }
               });
+
+              newMarkers.push(marker);
             }
           });
+
+          setMarkers(newMarkers);
 
           // Harita görünümünü ayarla
           if (results.length > 0 && results[0].geometry?.location) {
