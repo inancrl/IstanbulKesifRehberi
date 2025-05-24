@@ -92,7 +92,6 @@ export function SearchSidebar({
                   <SelectValue placeholder="Tüm Kategoriler" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tüm Kategoriler</SelectItem>
                   {BUSINESS_CATEGORIES.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {category.name}

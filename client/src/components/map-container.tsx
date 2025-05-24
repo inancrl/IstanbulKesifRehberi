@@ -87,7 +87,7 @@ export function MapContainer({
           const newMarkers: any[] = [];
           
           // Yeni markerları ekle
-          results.slice(0, 20).forEach((place) => {
+          results.slice(0, 50).forEach((place) => {
             if (place.geometry?.location) {
               const marker = new window.google.maps.Marker({
                 position: place.geometry.location,

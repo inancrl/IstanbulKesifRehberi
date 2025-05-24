@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, Heart, User, Menu, X, Star } from 'lucide-react';
+import { MapPin, Heart, User, Menu, X, Star, Compass } from 'lucide-react';
 import { SearchSidebar } from '@/components/search-sidebar';
 import { MapContainer } from '@/components/map-container';
 import { BusinessModal } from '@/components/business-modal';
@@ -13,7 +13,7 @@ export default function Home() {
   const [filters, setFilters] = useState<BusinessFilters>({
     query: '',
     district: 'all',
-    category: 'all',
+    category: 'restaurant',
     minRating: 0,
     maxDistance: 10,
     onlyOpen: false
@@ -121,8 +121,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <MapPin className="text-white text-lg" />
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <Compass className="text-white text-lg" />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">İstanbul Keşif Rehberi</h1>
@@ -198,7 +198,7 @@ export default function Home() {
               {/* Gerçek işletme listesi - Google Places verilerinden */}
               <div className="space-y-3">
                 {searchResults.length > 0 ? (
-                  searchResults.slice(0, 20).map((place, index) => (
+                  searchResults.slice(0, 40).map((place, index) => (
                     <div key={place.place_id || index} className="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow cursor-pointer">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
