@@ -1,0 +1,326 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* İstanbul temalı renkler */
+  --background: 210 11% 98%;
+  --foreground: 222 84% 5%;
+  --muted: 210 11% 96%;
+  --muted-foreground: 215 16% 47%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 84% 5%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 84% 5%;
+  --border: 214 13% 92%;
+  --input: 214 13% 92%;
+  /* İstanbul mavisi */
+  --primary: 207 90% 54%;
+  --primary-foreground: 211 100% 99%;
+  --secondary: 210 11% 96%;
+  --secondary-foreground: 222 84% 5%;
+  --accent: 210 11% 96%;
+  --accent-foreground: 222 84% 5%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+  --ring: 207 90% 54%;
+  --radius: 0.5rem;
+  
+  /* Özel renkler */
+  --istanbul-blue: 207 90% 54%;
+  --istanbul-red: 0 76% 60%;
+  --success-green: 142 71% 45%;
+  --warm-gray: 210 11% 98%;
+
+  /* Sidebar renkleri */
+  --sidebar-background: 0 0% 100%;
+  --sidebar-foreground: 222 84% 5%;
+  --sidebar-primary: 207 90% 54%;
+  --sidebar-primary-foreground: 211 100% 99%;
+  --sidebar-accent: 210 11% 96%;
+  --sidebar-accent-foreground: 222 84% 5%;
+  --sidebar-border: 214 13% 92%;
+  --sidebar-ring: 207 90% 54%;
+
+  /* Chart renkleri */
+  --chart-1: 207 90% 54%;
+  --chart-2: 142 71% 45%;
+  --chart-3: 0 84% 60%;
+  --chart-4: 45 93% 47%;
+  --chart-5: 262 83% 58%;
+}
+
+.dark {
+  --background: 222 84% 5%;
+  --foreground: 210 40% 98%;
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+  --popover: 222 84% 5%;
+  --popover-foreground: 210 40% 98%;
+  --card: 222 84% 5%;
+  --card-foreground: 210 40% 98%;
+  --border: 217 33% 17%;
+  --input: 217 33% 17%;
+  --primary: 207 90% 54%;
+  --primary-foreground: 211 100% 99%;
+  --secondary: 217 33% 17%;
+  --secondary-foreground: 210 40% 98%;
+  --accent: 217 33% 17%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 210 40% 98%;
+  --ring: 207 90% 54%;
+
+  --sidebar-background: 222 84% 5%;
+  --sidebar-foreground: 210 40% 98%;
+  --sidebar-primary: 207 90% 54%;
+  --sidebar-primary-foreground: 211 100% 99%;
+  --sidebar-accent: 217 33% 17%;
+  --sidebar-accent-foreground: 210 40% 98%;
+  --sidebar-border: 217 33% 17%;
+  --sidebar-ring: 207 90% 54%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+}
+
+@layer components {
+  /* İstanbul temalı yardımcı sınıflar */
+  .istanbul-blue {
+    @apply text-blue-600;
+  }
+
+  .bg-istanbul-blue {
+    @apply bg-blue-600;
+  }
+
+  .border-istanbul-blue {
+    @apply border-blue-600;
+  }
+
+  .istanbul-red {
+    @apply text-red-600;
+  }
+
+  .bg-istanbul-red {
+    @apply bg-red-600;
+  }
+
+  .success-green {
+    @apply text-green-600;
+  }
+
+  .bg-success-green {
+    @apply bg-green-600;
+  }
+
+  .warm-gray {
+    @apply text-gray-50;
+  }
+
+  .bg-warm-gray {
+    @apply bg-gray-50;
+  }
+
+  /* Smooth transitions */
+  .transition-all {
+    transition: all 0.2s ease-in-out;
+  }
+
+  /* Map container styles */
+  .map-container {
+    @apply w-full h-full relative overflow-hidden;
+  }
+
+  /* Business card hover effects */
+  .business-card {
+    @apply transform transition-transform duration-200 hover:scale-105 hover:shadow-lg;
+  }
+
+  /* Rating stars */
+  .rating-stars {
+    @apply flex items-center space-x-1;
+  }
+
+  /* Search input focus */
+  .search-input:focus {
+    @apply ring-2 ring-blue-500 ring-opacity-50 border-blue-500;
+  }
+}
+
+@layer utilities {
+  /* Responsive text sizes */
+  .text-responsive {
+    @apply text-sm md:text-base;
+  }
+
+  /* Glassmorphism effect */
+  .glass {
+    @apply bg-white/80 backdrop-blur-sm border border-white/20;
+  }
+
+  /* Animation classes */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+/* Keyframe animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Google Maps customizations */
+.gm-style {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+.gm-style .gm-style-iw-c {
+  @apply rounded-lg shadow-lg;
+}
+
+.gm-style .gm-style-iw-t::after {
+  background: white !important;
+}
+
+/* Custom range slider styles */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-track {
+  background: hsl(var(--muted));
+  height: 6px;
+  border-radius: 3px;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: hsl(var(--primary));
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  background: hsl(var(--primary));
+  transform: scale(1.1);
+}
+
+.slider::-moz-range-track {
+  background: hsl(var(--muted));
+  height: 6px;
+  border-radius: 3px;
+  border: none;
+}
+
+.slider::-moz-range-thumb {
+  background: hsl(var(--primary));
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading spinner */
+.loading-spinner {
+  @apply animate-spin rounded-full border-2 border-gray-200 border-t-blue-600;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .mobile-hidden {
+    @apply hidden;
+  }
+
+  .mobile-full {
+    @apply w-full;
+  }
+
+  .mobile-stack {
+    @apply flex-col space-y-2 space-x-0;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .business-card {
+    @apply border-2 border-gray-900;
+  }
+
+  .button-primary {
+    @apply bg-black text-white border-2 border-black;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-pulse-slow {
+    animation: none;
+  }
+
+  .transition-all {
+    transition: none;
+  }
+}
