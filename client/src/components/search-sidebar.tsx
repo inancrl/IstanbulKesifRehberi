@@ -153,27 +153,7 @@ export function SearchSidebar({
             </RadioGroup>
           </div>
 
-          {/* Mesafe Filtresi */}
-          <div className="mb-4">
-            <Label className="text-sm font-medium text-gray-700 mb-3 block">Maksimum Mesafe</Label>
-            <div className="px-3">
-              <RangeSlider
-                min={1}
-                max={25}
-                value={currentDistance}
-                onValueChange={(value) => {
-                  setCurrentDistance(value);
-                  updateFilter('maxDistance', value);
-                }}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-gray-500 mt-1">
-                <span>1 km</span>
-                <span>{currentDistance} km</span>
-                <span>25 km</span>
-              </div>
-            </div>
-          </div>
+
 
           {/* Açık/Kapalı Filtresi */}
           <div className="mb-4">

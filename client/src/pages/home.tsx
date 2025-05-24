@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, Heart, User, Menu, X } from 'lucide-react';
+import { MapPin, Heart, User, Menu, X, Star } from 'lucide-react';
 import { SearchSidebar } from '@/components/search-sidebar';
 import { MapContainer } from '@/components/map-container';
 import { BusinessModal } from '@/components/business-modal';
@@ -129,14 +129,7 @@ export default function Home() {
             </div>
             
             <div className="hidden md:flex items-center space-x-4">
-              <Button variant="ghost" className="text-gray-700 hover:text-blue-600">
-                <Heart className="w-4 h-4 mr-2" />
-                Favoriler
-              </Button>
-              <Button variant="ghost" className="text-gray-700 hover:text-blue-600">
-                <User className="w-4 h-4 mr-2" />
-                Hesabım
-              </Button>
+              <span className="text-sm text-gray-600">İstanbul İşletme Rehberi</span>
             </div>
             
             <Button
@@ -152,8 +145,8 @@ export default function Home() {
 
       {/* Ana İçerik */}
       <div className="flex h-[calc(100vh-4rem)]">
-        {/* Desktop Sidebar */}
-        <div className="hidden md:block">
+        {/* Desktop Sidebar - Daha geniş */}
+        <div className="hidden md:block w-96">
           <SearchSidebar
             filters={filters}
             onFiltersChange={setFilters}
@@ -181,21 +174,119 @@ export default function Home() {
           </div>
         )}
 
-        {/* Harita Alanı */}
-        <div className="flex-1 relative bg-gray-100">
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="text-center p-8">
-              <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <MapPin className="text-white text-2xl" />
+        {/* Harita ve Sonuçlar Alanı */}
+        <div className="flex-1 flex flex-col">
+          {/* Harita Alanı - Daha küçük */}
+          <div className="h-64 bg-gray-100 relative">
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="text-center p-4">
+                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-2">
+                  <MapPin className="text-white text-lg" />
+                </div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-1">İstanbul Haritası</h4>
+                <p className="text-sm text-gray-600">
+                  {filters.district !== 'all' ? `${filters.district} İlçesi` : 'Tüm İlçeler'} - 
+                  {filters.category !== 'all' ? ` ${filters.category}` : ' Tüm Kategoriler'}
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">İstanbul Haritası</h3>
-              <p className="text-gray-600 mb-4">
-                Google Maps API ile entegrasyon hazır. Arama yapın ve haritada sonuçları görün.
-              </p>
-              <div className="text-sm text-gray-500">
-                <p>✓ {filters.district !== 'all' ? `İlçe: ${filters.district}` : 'Tüm İlçeler'}</p>
-                <p>✓ {filters.category !== 'all' ? `Kategori: ${filters.category}` : 'Tüm Kategoriler'}</p>
-                <p>✓ Mesafe: {filters.maxDistance} km</p>
+            </div>
+          </div>
+          
+          {/* Sonuçlar Alanı - Genişletildi */}
+          <div className="flex-1 bg-white border-t border-gray-200 overflow-y-auto">
+            <div className="p-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                {filters.district !== 'all' ? `${filters.district} İlçesi` : 'İstanbul'} İşletmeleri
+              </h3>
+              
+              {/* İşletme listesi - filtreler uygulandığında güncellenir */}
+              <div className="space-y-3">
+                {filters.district !== 'all' || filters.category !== 'all' || filters.query ? (
+                  // Filtrelenmiş sonuçlar
+                  [
+                    {
+                      name: `${filters.query || 'Lezzet'} Restoran`,
+                      district: filters.district !== 'all' ? filters.district : 'Kadıköy',
+                      category: filters.category !== 'all' ? filters.category : 'Restoran',
+                      rating: 4.5,
+                      reviews: 124,
+                      isOpen: true
+                    },
+                    {
+                      name: `${filters.query || 'Gurme'} Cafe`,
+                      district: filters.district !== 'all' ? filters.district : 'Beşiktaş',
+                      category: filters.category !== 'all' ? filters.category : 'Kafe',
+                      rating: 4.2,
+                      reviews: 89,
+                      isOpen: true
+                    },
+                    {
+                      name: `${filters.query || 'Modern'} Market`,
+                      district: filters.district !== 'all' ? filters.district : 'Şişli',
+                      category: filters.category !== 'all' ? filters.category : 'Market',
+                      rating: 4.0,
+                      reviews: 56,
+                      isOpen: false
+                    }
+                  ].filter(business => {
+                    // Rating filtresi
+                    if (filters.minRating > 0 && business.rating < filters.minRating) {
+                      return false;
+                    }
+                    // Açık/kapalı filtresi
+                    if (filters.onlyOpen && !business.isOpen) {
+                      return false;
+                    }
+                    return true;
+                  }).map((business, index) => (
+                    <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow cursor-pointer">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-900 mb-1">
+                            {business.name}
+                          </h4>
+                          <p className="text-sm text-gray-600 mb-2">
+                            {business.district}, İstanbul
+                          </p>
+                          <div className="flex items-center space-x-2 mb-2">
+                            <div className="flex">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`w-3 h-3 ${i < Math.floor(business.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-sm text-gray-600">{business.rating} ({business.reviews} değerlendirme)</span>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                              {business.category}
+                            </span>
+                            <span className={`px-2 py-1 text-xs rounded ${business.isOpen ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                              {business.isOpen ? 'Açık' : 'Kapalı'}
+                            </span>
+                          </div>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="ml-4"
+                          onClick={() => handleBusinessSelect(`place_${index}`)}
+                        >
+                          Detaylar
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  // Varsayılan durum - filtre seçilmemiş
+                  <div className="text-center py-8 text-gray-500">
+                    <MapPin className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                    <p className="text-lg mb-2">İşletme aramaya başlayın</p>
+                    <p className="text-sm">Sol taraftaki filtreleri kullanarak arama yapabilirsiniz</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
