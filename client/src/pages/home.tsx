@@ -182,12 +182,24 @@ export default function Home() {
         )}
 
         {/* Harita Alanı */}
-        <MapContainer
-          onBusinessSelect={handleBusinessSelect}
-          searchParams={searchParams}
-          shouldSearch={shouldSearch}
-          onSearchComplete={handleSearchComplete}
-        />
+        <div className="flex-1 relative bg-gray-100">
+          <div className="w-full h-full flex items-center justify-center">
+            <div className="text-center p-8">
+              <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <MapPin className="text-white text-2xl" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">İstanbul Haritası</h3>
+              <p className="text-gray-600 mb-4">
+                Google Maps API ile entegrasyon hazır. Arama yapın ve haritada sonuçları görün.
+              </p>
+              <div className="text-sm text-gray-500">
+                <p>✓ {filters.district !== 'all' ? `İlçe: ${filters.district}` : 'Tüm İlçeler'}</p>
+                <p>✓ {filters.category !== 'all' ? `Kategori: ${filters.category}` : 'Tüm Kategoriler'}</p>
+                <p>✓ Mesafe: {filters.maxDistance} km</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* İşletme Detay Modal */}
