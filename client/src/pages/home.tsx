@@ -12,8 +12,8 @@ export default function Home() {
   // Durum değişkenleri
   const [filters, setFilters] = useState<BusinessFilters>({
     query: '',
-    district: '',
-    category: '',
+    district: 'all',
+    category: 'all',
     minRating: 0,
     maxDistance: 10,
     onlyOpen: false
@@ -59,7 +59,7 @@ export default function Home() {
     let searchRadius = filters.maxDistance * 1000; // km to meters
 
     // İlçe seçilmişse o ilçenin merkezini kullan
-    if (filters.district) {
+    if (filters.district && filters.district !== 'all') {
       const district = getDistrictByName(filters.district);
       if (district) {
         searchLocation = district.center;
@@ -68,7 +68,7 @@ export default function Home() {
 
     // Kategori seçilmişse type'ları al
     let searchType = '';
-    if (filters.category) {
+    if (filters.category && filters.category !== 'all') {
       const types = getCategoryTypes(filters.category);
       if (types.length > 0) {
         searchType = types[0]; // İlk type'ı kullan

@@ -29,6 +29,7 @@ export function useGoogleMaps(mapElementId: string): UseGoogleMapsReturn {
   // Google Maps API'yi yükle ve haritayı başlat
   useEffect(() => {
     let mounted = true;
+    let timeoutId: NodeJS.Timeout;
 
     const initializeMap = async () => {
       try {
@@ -36,29 +37,34 @@ export function useGoogleMaps(mapElementId: string): UseGoogleMapsReturn {
         
         if (!mounted) return;
 
-        const mapElement = document.getElementById(mapElementId);
-        if (!mapElement) {
-          throw new Error(`Harita elementi bulunamadı: ${mapElementId}`);
-        }
+        // DOM elementinin hazır olmasını bekle
+        timeoutId = setTimeout(() => {
+          const mapElement = document.getElementById(mapElementId);
+          if (!mapElement) {
+            console.warn(`Harita elementi henüz hazır değil: ${mapElementId}`);
+            return;
+          }
 
-        const mapInstance = new google.maps.Map(mapElement, {
-          center: ISTANBUL_CENTER,
-          zoom: 12,
-          styles: [
-            {
-              featureType: "poi",
-              elementType: "labels",
-              stylers: [{ visibility: "off" }]
-            }
-          ],
-          mapTypeControl: true,
-          streetViewControl: true,
-          fullscreenControl: true,
-          zoomControl: true
-        });
+          const mapInstance = new google.maps.Map(mapElement, {
+            center: ISTANBUL_CENTER,
+            zoom: 12,
+            styles: [
+              {
+                featureType: "poi",
+                elementType: "labels",
+                stylers: [{ visibility: "off" }]
+              }
+            ],
+            mapTypeControl: true,
+            streetViewControl: true,
+            fullscreenControl: true,
+            zoomControl: true
+          });
 
-        setMap(mapInstance);
-        setIsLoaded(true);
+          setMap(mapInstance);
+          setIsLoaded(true);
+        }, 100);
+
       } catch (err) {
         console.error('Google Maps başlatma hatası:', err);
         setError(err instanceof Error ? err.message : 'Harita yüklenemedi');
@@ -69,13 +75,24 @@ export function useGoogleMaps(mapElementId: string): UseGoogleMapsReturn {
 
     return () => {
       mounted = false;
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      // Mevcut marker'ları temizle
+      clearMarkers();
     };
   }, [mapElementId]);
 
   // Marker'ları temizle
   const clearMarkers = () => {
-    markersRef.current.forEach(marker => marker.setMap(null));
-    markersRef.current = [];
+    if (markersRef.current) {
+      markersRef.current.forEach(marker => {
+        if (marker) {
+          marker.setMap(null);
+        }
+      });
+      markersRef.current = [];
+    }
   };
 
   // İşletme ara

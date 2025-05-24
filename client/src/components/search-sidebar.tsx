@@ -83,7 +83,7 @@ export function SearchSidebar({
                   <SelectValue placeholder="Tüm İlçeler" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Tüm İlçeler</SelectItem>
+                  <SelectItem value="all">Tüm İlçeler</SelectItem>
                   {ISTANBUL_DISTRICTS.map((district) => (
                     <SelectItem key={district.id} value={district.id}>
                       {district.name}
@@ -101,7 +101,7 @@ export function SearchSidebar({
                   <SelectValue placeholder="Tüm Kategoriler" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Tüm Kategoriler</SelectItem>
+                  <SelectItem value="all">Tüm Kategoriler</SelectItem>
                   {BUSINESS_CATEGORIES.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {category.name}

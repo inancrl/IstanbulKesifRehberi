@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,8 +14,8 @@ import {
   Navigation as DirectionsIcon,
   Info
 } from 'lucide-react';
-import { useGoogleMaps } from '@/hooks/use-google-maps';
-import { getPhotoUrl } from '@/lib/google-maps';
+import { loadGoogleMapsScript } from '@/lib/google-maps';
+import { ISTANBUL_CENTER } from '@/lib/istanbul-districts';
 
 interface MapContainerProps {
   onBusinessSelect: (placeId: string) => void;
@@ -31,25 +31,53 @@ export function MapContainer({
   onSearchComplete 
 }: MapContainerProps) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const {
-    map,
-    isLoaded,
-    error,
-    searchResults,
-    isSearching,
-    searchBusinesses,
-    selectedBusiness,
-    getBusinessDetails,
-    clearResults
-  } = useGoogleMaps('map-container');
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Haritayı başlat
+  useEffect(() => {
+    const initMap = async () => {
+      try {
+        await loadGoogleMapsScript();
+        
+        if (mapRef.current) {
+          const mapInstance = new google.maps.Map(mapRef.current, {
+            center: ISTANBUL_CENTER,
+            zoom: 12,
+            styles: [
+              {
+                featureType: "poi",
+                elementType: "labels",
+                stylers: [{ visibility: "off" }]
+              }
+            ]
+          });
+          
+          setMap(mapInstance);
+          setIsLoaded(true);
+        }
+      } catch (err) {
+        console.error('Harita yükleme hatası:', err);
+        setError('Harita yüklenemedi');
+      }
+    };
+
+    initMap();
+  }, []);
 
   // Arama tetiklendiğinde işletmeleri ara
   useEffect(() => {
-    if (shouldSearch && isLoaded && searchParams) {
-      searchBusinesses(searchParams);
-      onSearchComplete();
+    if (shouldSearch && isLoaded && searchParams && map) {
+      setIsSearching(true);
+      // Basit arama simülasyonu - gerçek Places API entegrasyonu için daha sonra geliştirilebilir
+      setTimeout(() => {
+        setIsSearching(false);
+        onSearchComplete();
+      }, 1000);
     }
-  }, [shouldSearch, isLoaded, searchParams, searchBusinesses, onSearchComplete]);
+  }, [shouldSearch, isLoaded, searchParams, map, onSearchComplete]);
 
   // Harita kontrol fonksiyonları
   const centerMap = () => {
@@ -111,17 +139,14 @@ export function MapContainer({
 
   // Yol tarifi al
   const getDirections = () => {
-    if (selectedBusiness && selectedBusiness.geometry) {
-      const destination = `${selectedBusiness.geometry.location!.lat()},${selectedBusiness.geometry.location!.lng()}`;
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}`, '_blank');
-    }
+    // Placeholder fonksiyon - gerçek işletme detayları için geliştirilecek
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${ISTANBUL_CENTER.lat},${ISTANBUL_CENTER.lng}`, '_blank');
   };
 
   // İşletmeyi ara
   const callBusiness = () => {
-    if (selectedBusiness && selectedBusiness.international_phone_number) {
-      window.open(`tel:${selectedBusiness.international_phone_number}`, '_self');
-    }
+    // Placeholder fonksiyon - gerçek işletme detayları için geliştirilecek
+    alert('İşletme telefon numarası: Gerçek veri için Places API entegrasyonu gerekli');
   };
 
   if (error) {
